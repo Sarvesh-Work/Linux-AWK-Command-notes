@@ -163,68 +163,235 @@ awk '{if($NF>50000) $5="High"; else $5="Low"; print $0}' emp.txt
 # - `if($NF>50000)`: Checks if the salary is greater than 50000.
 # - `$5="High"`: Adds a new column with "High" or "Low".
 
+**AWK Scripting**
 
-# AWK Script Guide
+**lets st
 
-# Creating an AWK script file
-# Use the following command to create a file with .awk extension:
-vi filename.awk
+**BEGIN and END Blocks**
+    In AWK scripting, we can perform actions **before** or **after** processing a file by using `BEGIN` and `END` blocks. These blocks allow us to perform initial setups and final actions.
 
-# Inside the file, add the following content:
-#!/bin/awk -f
+    **Syntax:**
+        awk 'BEGIN{actions} {actions} END{actions}' file
 
-BEGIN {
-    print "Hello"
-}
+**EXAMPLES**
 
-{
-    print $1  # Prints the first column of each line
-}
+**Example 1: Print Information Before and After File Reading**
 
-# Save and exit the file, then make it executable:
-chmod +x filename.awk
+    Consider the following AWK command to print information before and after reading the file `emp.txt`:
 
-# Execute the script by passing a data file (e.g., emp.txt) as an argument:
-./filename.awk emp.txt
+    ```bash
+    awk 'BEGIN{print "----emp data----"} {print $0} END{print "-----emp data ends-----"}' emp.txt
+    ```
 
-# Alternative Execution Method
-# Instead of writing AWK scripts inline:
-awk 'BEGIN{print "Hello"} {print $4}' emp.txt
+    **Explanation:**
+    - `BEGIN{print "----emp data----"}`: This prints a message before reading the file.
+    - `{print $0}`: This prints the entire line from the file.
+    - `END{print "-----emp data ends-----"}`: This prints a message after processing the file.
 
-# You can create a separate file and write conditions inside it:
-vi script.awk
+    **Output:**
+    ```
+    ----emp data----
+    1   John       HR          50000
+    2   Alice      IT          75000
+    3   Bob        Sales       60000
+    4   Eve        IT          80000
+    5   Charlie    HR          55000
+    6   David      Sales       62000
+    -----emp data ends-----
+    ```
 
-# Add the following content:
-BEGIN {
-    print "Hello"
-}
+---
 
-{
-    print $0  # Prints the entire line
-}
+**Example 2: Find Sum of Salary Column**
 
-END {
-    print "End"
-}
+    To calculate the sum of the **salary** column from `emp.txt`, use the following AWK command:
 
-# Save and execute using:
-awk -f script.awk emp.txt
+    ```bash
+    awk 'BEGIN{sum=0} {sum=sum+$NF} END{print "sum of the salary:" sum}' emp.txt
+    ```
 
-# Note: The -f flag is required to specify an AWK script file.
+    **Explanation:**
+    - `BEGIN{sum=0}`: Initializes the `sum` variable to 0 before processing any lines.
+    - `{sum=sum+$NF}`: Adds the value from the **last field** (`$NF` represents the last field, typically the salary) to `sum` for each line.
+    - `END{print "sum of the salary:" sum}`: Prints the final sum after processing all lines.
 
-# Defining Functions in AWK
-# AWK also supports functions, making it easier to reuse logic.
+    **Output:**
+    ```
+    sum of the salary: 380000
+    ```
 
-vi function.awk
+---
 
-# Add the following content:
-function greet(name) {
-    print "Hello, " name
-}
+**Example 3: Calculate the Average Salary**
 
-BEGIN {
-    greet("User")
-}
+    To calculate the average salary from `emp.txt`, use this AWK command:
 
-# Save and execute using:
-awk -f function.awk
+    ```bash
+    awk 'BEGIN{sum=0; users=0} NR>2 {sum=sum+$NF; if($NF>0) users++} END{print "avg of salary:" sum/users}' emp.txt
+    ```
+
+    **Explanation:**
+    - `BEGIN{sum=0; users=0}`: Initializes `sum` to 0 and `users` to 0.
+    - `NR>2 {sum=sum+$NF; if($NF>0) users++}`: Starts processing from line 3 (`NR>2`), adds salary to `sum`, and counts users with a salary greater than 0.
+    - `END{print "avg of salary:" sum/users}`: Calculates and prints the average salary.
+
+    **Output:**
+    ```
+    avg of salary: 63333.3333333
+    ```
+
+---
+
+**Example 4: Find Length of the Longest Line**
+
+    To get the length of the longest line in `emp.txt`, use the following command:
+
+    ```bash
+    awk '{if(length($0)>max) max=length($0)} END{print "Longest line length:", max}' emp.txt
+    ```
+
+    **Explanation:**
+    - `{if(length($0)>max) max=length($0)}`: This checks the length of each line using `length($0)` and updates the `max` variable with the longest length.
+    - `END{print "Longest line length:", max}`: Prints the length of the longest line.
+
+    **Output:**
+    ```
+    Longest line length: 41
+    ```
+
+---
+
+**Example 5: Print "High" or "Low" Based on Salary**
+
+    To add a column indicating if the salary is high (greater than 50K) or low (less than or equal to 50K), use the following AWK command:
+
+    ```bash
+    awk '{if($NF>50000) $7="High"; else $7="Low"; print $0}' emp.txt
+    ```
+
+    **Explanation:**
+    - `{if($NF>50000) $7="High"; else $7="Low"}`: Checks if the salary (last field, `$NF`) is greater than 50,000 and assigns "High" or "Low" to the 7th field.
+    - `print $0`: Prints the entire line after modifying the 7th field.
+
+    **Output:**
+    ```
+    1   John       HR          50000   Low
+    2   Alice      IT          75000   High
+    3   Bob        Sales       60000   High
+    4   Eve        IT          80000   High
+    5   Charlie    HR          55000   High
+    6   David      Sales       62000   High
+    ```
+
+---
+
+**Using AWK in a Script**
+
+    Writing multiple conditions directly in an AWK command can be complex. To simplify, you can write AWK scripts in a file and execute them.
+
+    **Creating and Executing an AWK Script:**
+
+    1. Create a new file with a `.awk` extension (e.g., `awk_file.awk`).
+    2. Inside the file, include the following:
+
+        ```bash
+        #!/bin/awk -f
+
+        BEGIN {
+          print "hello"
+        }
+
+        {
+          print $1
+        }
+        ```
+
+    3. Make the script executable:
+
+        ```bash
+        chmod +x awk_file.awk
+        ```
+
+    4. Run the script with a file argument:
+
+        ```bash
+        ./awk_file.awk emp.txt
+        ```
+
+    **Explanation:**
+    - `#!/bin/awk -f`: Specifies the AWK interpreter.
+    - `BEGIN { print "hello" }`: Prints "hello" before processing any lines.
+    - `{ print $1 }`: Prints the first field (e.g., employee ID) for each line.
+
+    **Output:**
+    ```
+    hello
+    1
+    2
+    3
+    4
+    5
+    6
+    ```
+
+---
+
+**Multiple Conditions in AWK Script**
+
+    When you have multiple conditions to evaluate, it is easier to write them in a script file:
+
+    ```bash
+    #!/bin/awk -f
+
+    BEGIN {
+      print "hello"
+    }
+
+    {
+      print $0
+    }
+
+    END {
+      print "end"
+    }
+    ```
+
+    To execute this script, use:
+
+    ```bash
+    awk -f filename.awk emp.txt
+    ```
+
+    **Explanation:**
+    - `BEGIN { print "hello" }`: Prints "hello" before reading the file.
+    - `{ print $0 }`: Prints the entire line.
+    - `END { print "end" }`: Prints "end" after reading the file.
+
+---
+
+**Creating Functions in AWK**
+
+    AWK allows you to create functions for repetitive tasks. Functions help simplify complex scripts by breaking them into reusable parts.
+
+    **Example of a Function to Add Two Numbers:**
+
+    ```bash
+    #!/bin/awk -f
+
+    function add(a, b) {
+      return a + b
+    }
+
+    BEGIN {
+      print "Sum of 5 and 7 is:", add(5, 7)
+    }
+    ```
+
+    **Output:**
+    ```
+    Sum of 5 and 7 is: 12
+    ```
+
+---
+
+This complete AWK scripting guide provides examples, syntax, and usage instructions in a **bash-style** format. You can now copy and use it for your AWK scripting needs.
