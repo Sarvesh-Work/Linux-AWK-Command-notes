@@ -132,6 +132,7 @@ awk -F'[,:-]' '{print $4}' emp.txt
 awk '{gsub("Bob", "Rob"); print $0}' emp.txt
 # Explanation:
 # - `gsub("Bob", "Rob")`: Replaces "Bob" with "Rob".
+  - this action is not permanent 
 
 # 2. Find the Length of Characters in a Column:
 awk '{print $2, length($2)}' emp.txt
