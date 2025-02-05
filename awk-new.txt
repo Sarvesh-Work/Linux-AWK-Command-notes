@@ -1,0 +1,230 @@
+
+# AWK COMMAND IN LINUX - DETAILED EXPLANATION
+
+
+# What is AWK?
+ ------------
+ AWK is a powerful text-processing tool in Linux. It is used to:
+ - Extract specific columns or fields from a file.
+- Perform calculations (like sum, average, etc.).
+ - Search for patterns or words in a file.
+- Format and manipulate text data.
+
+ Basic Syntax:
+ -------------
+ awk 'pattern {action}' file-name
+   - pattern: A condition to filter lines (optional).
+   - action: What to do with the matching lines (e.g., print, calculate).
+   - file-name: The file to process.
+
+ Example 1: Print the 2nd Column from a File
+ -------------------------------------------
+Suppose you have a file `country.txt` with the following data:
+country  capitals
+ -----------------
+ india    delhi
+ usa      washington
+uk       london
+
+ To print only the 2nd column (capitals), use:
+awk '{print $2}' country.txt
+ Explanation:
+ - `{print $2}`: Print the 2nd column.
+ - `$2`: Refers to the 2nd field (column) in each line.
+- `country.txt`: The file to process.
+
+ Predefined Variables in AWK:
+# ----------------------------
+# - NR: Current line number (Number of Records).
+# - NF: Number of fields in the current line.
+# - $0: The entire line.
+# - $1, $2, $3, etc.: Specific fields (columns) in the line.
+
+# Example 2: Working with Employee Data
+# -------------------------------------
+# Suppose you have a file `emp.txt` with the following data:
+# ID  Name       Department  Salary
+# --------------------------------
+# 1   John       HR          50000
+# 2   Alice      IT          75000
+# 3   Bob        Sales       60000
+# 4   Eve        IT          80000
+# 5   Charlie    HR          55000
+# 6   David      Sales       62000
+
+# 1. Print the Salary Column (4th Column):
+awk '{print $4}' emp.txt
+# Explanation:
+# - `$4`: Refers to the 4th column (Salary).
+
+# 2. Print Name and Salary:
+awk '{print $2, $4}' emp.txt
+# Explanation:
+# - `$2`: Name column.
+# - `$4`: Salary column.
+
+# 3. Search for a Specific Word (e.g., "John"):
+awk '/John/{print $0}' emp.txt
+# Explanation:
+# - `/John/`: Searches for lines containing "John".
+# - `{print $0}`: Prints the entire line where "John" is found.
+
+# 4. Print Line Numbers with Data:
+awk '{print NR, $0}' emp.txt
+# Explanation:
+# - `NR`: Current line number.
+# - `$0`: The entire line.
+
+# 5. Print Only Line Number 5:
+awk 'NR==5 {print $0}' emp.txt
+# Explanation:
+# - `NR==5`: Matches the 5th line.
+
+# 6. Print a Range of Lines (Lines 2 to 5):
+awk 'NR==2,NR==5 {print $0}' emp.txt
+# Explanation:
+# - `NR==2,NR==5`: Matches lines from 2 to 5.
+
+# 7. Print Line Numbers of Empty Lines:
+awk 'NF==0 {print NR}' emp.txt
+# Explanation:
+# - `NF==0`: Matches lines with no fields (empty lines).
+
+# 8. Search for Multiple Words (e.g., "John" and "David"):
+awk '/John|David/{print $0}' emp.txt
+# Explanation:
+# - `/John|David/`: Searches for lines containing "John" or "David".
+
+# 9. Check if a Character is Present in a Column (e.g., "a" in Names):
+awk '$2 ~ /a/ {print $0}' emp.txt
+# Explanation:
+# - `$2 ~ /a/`: Checks if the 2nd column (Name) contains the letter "a".
+
+# Working with CSV Files:
+# -----------------------
+# Suppose you have a CSV file `emp.csv` with the following data:
+# ID,Name,Department,Salary
+# 1,John,HR,50000
+# 2,Alice,IT,75000
+# 3,Bob,Sales,60000
+# 4,Eve,IT,80000
+# 5,Charlie,HR,55000
+# 6,David,Sales,62000
+
+# 1. Print the 3rd Column (Department) from a CSV File:
+awk -F, '{print $3}' emp.csv
+# Explanation:
+# - `-F,`: Specifies the field separator as a comma.
+
+# 2. Print Employees with Salary > 50000:
+awk -F, '$NF > 50000 {print $0}' emp.csv
+# Explanation:
+# - `$NF`: Refers to the last field (Salary).
+
+# 3. Handle Multiple Delimiters (e.g., comma, colon, hyphen):
+awk -F'[,:-]' '{print $4}' emp.txt
+# Explanation:
+# - `-F'[,:-]'`: Specifies multiple delimiters.
+
+# Advanced AWK Features:
+# ----------------------
+# 1. Replace a Word in a File:
+awk '{gsub("Bob", "Rob"); print $0}' emp.txt
+# Explanation:
+# - `gsub("Bob", "Rob")`: Replaces "Bob" with "Rob".
+
+# 2. Find the Length of Characters in a Column:
+awk '{print $2, length($2)}' emp.txt
+# Explanation:
+# - `length($2)`: Calculates the length of the 2nd column (Name).
+
+# 3. Find the Position/Index of a Word in a File:
+awk '/Rob/{print NR, index($0, "Rob")}' emp.txt
+# Explanation:
+# - `index($0, "Rob")`: Finds the position of "Rob" in the line.
+
+# 4. Print Values in Upper or Lower Case:
+# Convert to Lowercase:
+awk '{print tolower($2)}' emp.txt
+# Convert to Uppercase:
+awk '{print toupper($2)}' emp.txt
+
+
+# Example: Calculate the Sum of the Salary Column:
+awk 'BEGIN{sum=0} {sum=sum+$NF} END{print "Sum of Salary:", sum}' emp.txt
+# Explanation:
+# - `sum=0`: Initializes a variable.
+# - `sum=sum+$NF`: Adds the salary to the sum.
+# - `END{print "Sum of Salary:", sum}`: Prints the total sum.
+
+# Example: Add a Column to Indicate High or Low Salary:
+awk '{if($NF>50000) $5="High"; else $5="Low"; print $0}' emp.txt
+# Explanation:
+# - `if($NF>50000)`: Checks if the salary is greater than 50000.
+# - `$5="High"`: Adds a new column with "High" or "Low".
+
+
+# AWK Script Guide
+
+# Creating an AWK script file
+# Use the following command to create a file with .awk extension:
+vi filename.awk
+
+# Inside the file, add the following content:
+#!/bin/awk -f
+
+BEGIN {
+    print "Hello"
+}
+
+{
+    print $1  # Prints the first column of each line
+}
+
+# Save and exit the file, then make it executable:
+chmod +x filename.awk
+
+# Execute the script by passing a data file (e.g., emp.txt) as an argument:
+./filename.awk emp.txt
+
+# Alternative Execution Method
+# Instead of writing AWK scripts inline:
+awk 'BEGIN{print "Hello"} {print $4}' emp.txt
+
+# You can create a separate file and write conditions inside it:
+vi script.awk
+
+# Add the following content:
+BEGIN {
+    print "Hello"
+}
+
+{
+    print $0  # Prints the entire line
+}
+
+END {
+    print "End"
+}
+
+# Save and execute using:
+awk -f script.awk emp.txt
+
+# Note: The -f flag is required to specify an AWK script file.
+
+# Defining Functions in AWK
+# AWK also supports functions, making it easier to reuse logic.
+
+vi function.awk
+
+# Add the following content:
+function greet(name) {
+    print "Hello, " name
+}
+
+BEGIN {
+    greet("User")
+}
+
+# Save and execute using:
+awk -f function.awk
